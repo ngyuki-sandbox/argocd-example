@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  labels:
+    name: app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      name: app
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: app
+      labels:
+        name: app
+    spec:
+      shareProcessNamespace: true
+      containers:
+        - name: app
+          image: php:fpm-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: HELM_REVISION
+              value: "{{ .Release.Revision }}"
+            - name: APP_ENV
+              value: "{{ .Values.envs.app.APP_ENV }}"
+            - name: COMMIT_HASH
+              value: "{{ .Values.envs.app.COMMIT_HASH }}"
+          envFrom:
+            - configMapRef:
+                name: envs
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+          volumeMounts:
+            - name: php-index
+              mountPath: /var/www/html
+
+        - name: nginx
+          image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 60
+          env:
+            - name: TZ
+              value: Asia/Tokyo
+            - name: FASCGI_HOST
+              value: 127.0.0.1:9000
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/templates
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+        - name: php-index
+          configMap:
+            name: php-index

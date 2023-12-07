@@ -1,0 +1,98 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: argocd
+  name: argocd-notifications-cm
+data:
+  context: |
+    argocdUrl: http://localhost:8080
+
+  service.slack: |
+    token: $slack-token
+    username: ArgoCD
+    icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+
+  service.webhook.slack-incoming: |
+    url: $slack-incoming
+    headers:
+      - name: content-type
+        value: application/json
+
+  trigger.on-sync-succeeded: |
+    - when: app.status.operationState.phase in ['Succeeded']
+      oncePer: app.status.sync.revision
+      send:
+        - app-sync-status
+
+  template.app-sync-status: |
+    message: |
+      Application {{.app.metadata.name}} sync is {{.app.status.sync.status}}.
+      Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
+    slack:
+      attachments: |
+        [{
+          "title": "{{.app.metadata.name}}",
+          "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+          "color": "#18be52",
+          "fields": [{
+            "title": "Sync Status",
+            "value": "{{.app.status.sync.status}}",
+            "short": true
+          }, {
+            "title": "Repository",
+            "value": "{{.app.spec.source.repoURL}}",
+            "short": true
+          }]
+        }]
+    webhook:
+      slack-incoming:
+        method: POST
+        body: |
+          {
+            "username": "ArgoCD",
+            "channel": "{{ .recipient }}",
+            "icon_url" : "https://argo-cd.readthedocs.io/en/stable/assets/logo.png",
+            "attachments": [{
+              "color": "#00ff00",
+              "title": "{{.app.metadata.name}}",
+              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "fields": [
+                {
+                  "title": "Operation State",
+                  "value": "{{app.status.operationState.phase}}",
+                  "short": true
+                },
+                {
+                  "title": "Sync Status",
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "Health Status",
+                  "value": "{{.app.status.health.status}}",
+                  "short": true
+                },
+                {
+                  "title": "Repository",
+                  "value": "{{.app.spec.source.repoURL}}",
+                  "short": true
+                },
+                {
+                  "title": "Author",
+                  "value": "{{(call .repo.GetCommitMetadata .app.status.sync.revision).Author}}",
+                  "short": true
+                },
+                {
+                  "title": "Revision",
+                  "value": "{{.app.status.sync.revision}}",
+                  "short": false
+                },
+                {
+                  "title": "Message",
+                  "value": "{{(call .repo.GetCommitMetadata .app.status.sync.revision).Message}}",
+                  "short": false
+                }
+              ]
+            }]
+          }

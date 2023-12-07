@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: argocd-notifications
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: "goto-test"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack-incoming: "goto-test"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ngyuki-sandbox/argocd-example.git
+    targetRevision: main
+    path: apps/argocd-notifications/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd-notifications
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

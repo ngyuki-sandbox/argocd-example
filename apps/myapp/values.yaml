@@ -1,0 +1,6 @@
+---
+
+envs:
+  app:
+    APP_ENV: "unknown"
+    COMMIT_HASH: "1234567"

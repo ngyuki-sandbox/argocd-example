@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: envs
+data:
+  X_AAA: aaa
+  X_BBB: bbb
+  X_CCC: ccc

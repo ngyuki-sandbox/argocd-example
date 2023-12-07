@@ -1,0 +1,110 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: hook-pre-
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 60
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      name: hook
+    spec:
+      containers:
+        - name: hook
+          image: curlimages/curl
+          env:
+            - name: MESSAGE
+              value: PreSync
+          envFrom:
+            - secretRef:
+                name: secrets
+          command:
+            - /opt/argocd-hooks/script.sh
+          volumeMounts:
+            - name: script
+              mountPath: /opt/argocd-hooks
+              readOnly: true
+      volumes:
+        - name: script
+          configMap:
+            name: script
+            defaultMode: 0755
+      restartPolicy: Never
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: hook-post-
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 60
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      name: hook
+    spec:
+      containers:
+        - name: hook
+          image: curlimages/curl
+          env:
+            - name: MESSAGE
+              value: PostSync
+          envFrom:
+            - secretRef:
+                name: secrets
+          command:
+            - /opt/argocd-hooks/script.sh
+          volumeMounts:
+            - name: script
+              mountPath: /opt/argocd-hooks
+              readOnly: true
+      volumes:
+        - name: script
+          configMap:
+            name: script
+            defaultMode: 0755
+      restartPolicy: Never
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: hook-fail-
+  annotations:
+    argocd.argoproj.io/hook: SyncFail
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 60
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      name: hook
+    spec:
+      containers:
+        - name: hook
+          image: curlimages/curl
+          env:
+            - name: MESSAGE
+              value: SyncFail
+          envFrom:
+            - secretRef:
+                name: secrets
+          command:
+            - /opt/argocd-hooks/script.sh
+          volumeMounts:
+            - name: script
+              mountPath: /opt/argocd-hooks
+              readOnly: true
+      volumes:
+        - name: script
+          configMap:
+            name: script
+            defaultMode: 0755
+      restartPolicy: Never
