@@ -1,0 +1,7 @@
+---
+
+helm:
+  valuesObject:
+    envs:
+      app:
+        APP_ENV: "dev"
