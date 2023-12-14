@@ -1,7 +1,6 @@
 ---
 
 helm:
-  valuesObject:
-    envs:
-      app:
-        APP_ENV: "dev"
+  valueFiles:
+    - values.yaml
+    - values-ovedrride.yaml
