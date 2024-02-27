@@ -1,0 +1,37 @@
+{{- if .Values.pr_values }}
+{{- range .Values.pr_values }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: {{ .name }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ngyuki-sandbox/argocd-example.git
+    targetRevision: main
+    path: apps/helm-reviews/
+    helm:
+      parameters:
+        - name: COMMIT_HASH
+          value: "{{ .COMMIT_HASH }}"
+        - name: pr_values
+          value: ""
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .name }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    # https://github.com/argoproj/argo-cd/issues/7875#issuecomment-1954504713
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/instance: {{ .name }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,7 @@
+---
+
+COMMIT_HASH: "0123456"
+
+pr_values:
+  - { name: helm-reviews-pr-1, COMMIT_HASH: "1234567" }
+  - { name: helm-reviews-pr-2, COMMIT_HASH: "2345678" }

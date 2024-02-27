@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: helm-reviews
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ngyuki-sandbox/argocd-example.git
+    targetRevision: main
+    path: apps/helm-reviews/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: helm-reviews
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
