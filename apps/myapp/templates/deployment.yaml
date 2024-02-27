@@ -24,12 +24,21 @@ spec:
           image: php:fpm-alpine
           imagePullPolicy: IfNotPresent
           env:
-            - name: HELM_REVISION
-              value: "{{ .Release.Revision }}"
-            - name: APP_ENV
-              value: "{{ .Values.envs.app.APP_ENV }}"
-            - name: COMMIT_HASH
-              value: "{{ .Values.envs.app.COMMIT_HASH }}"
+            - { name: APP_ENV,                            value: "{{ .Values.envs.app.APP_ENV }}" }
+            - { name: COMMIT_HASH,                        value: "{{ .Values.envs.app.COMMIT_HASH }}" }
+            - { name: HELM_NAME,                          value: "{{ .Release.Name }}" }
+            - { name: HELM_NAMESPACE,                     value: "{{ .Release.Namespace }}" }
+            - { name: HELM_IS_UPGRADE,                    value: "{{ .Release.IsUpgrade }}" }
+            - { name: HELM_IS_INSTALL,                    value: "{{ .Release.IsInstall }}" }
+            - { name: HELM_REVISION,                      value: "{{ .Release.Revision }}" }
+            - { name: HELM_SERVICE,                       value: "{{ .Release.Service }}" }
+            - { name: ARGOCD_APP_NAME,                    value: "{{ .Values.ARGOCD_APP_NAME }}" }
+            - { name: ARGOCD_APP_NAMESPACE,               value: "{{ .Values.ARGOCD_APP_NAMESPACE }}" }
+            - { name: ARGOCD_APP_REVISION,                value: "{{ .Values.ARGOCD_APP_REVISION }}" }
+            - { name: ARGOCD_APP_REVISION_SHORT,          value: "{{ .Values.ARGOCD_APP_REVISION_SHORT }}" }
+            - { name: ARGOCD_APP_SOURCE_PATH,             value: "{{ .Values.ARGOCD_APP_SOURCE_PATH }}" }
+            - { name: ARGOCD_APP_SOURCE_REPO_URL,         value: "{{ .Values.ARGOCD_APP_SOURCE_REPO_URL }}" }
+            - { name: ARGOCD_APP_SOURCE_TARGET_REVISION,  value: "{{ .Values.ARGOCD_APP_SOURCE_TARGET_REVISION }}" }
           envFrom:
             - configMapRef:
                 name: envs
