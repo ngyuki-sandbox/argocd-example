@@ -1,20 +1,27 @@
 # argocd
 
+## quick start
+
 ```sh
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 
 kubectl create namespace argocd
 
-helm install -n argocd argocd argo/argo-cd \
-  --set configs.params.server\\.insecure=true \
-  --set configs.cm.exec\\.enabled=true
+helm install -n argocd argocd argo/argo-cd --set configs.params.server\\.insecure=true --set configs.cm.exec\\.enabled=true
 
 kubectl get pods -n argocd -w
 kubectl get service -n argocd
 
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 kubectl port-forward service/argocd-server -n argocd 8080:443
+
+open http://localhost:8080
+```
+
+```sh
+curl http://localhost:8080/api/webhook -H content-type:application/json -H X-GitHub-Event:push \
+  -d '{"ref":"refs/heads/main","repository":{"html_url":"https://github.com/ngyuki-sandbox/argocd-example"}}'
 ```
 
 ## argocd-apps
