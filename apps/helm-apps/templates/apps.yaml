@@ -1,0 +1,26 @@
+# {{ $ARGOCD_APP_SOURCE_PATH := .Values.ARGOCD_APP_SOURCE_PATH }}
+# {{ range $path, $_ :=  .Files.Glob  "*/cm.yaml" }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: 'helm-apps-{{ dir $path }}'
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ngyuki-sandbox/argocd-example.git
+    targetRevision: main
+    path: '{{ $ARGOCD_APP_SOURCE_PATH }}/{{ dir $path }}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: 'helm-apps-{{ dir $path }}'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+# {{- end }}

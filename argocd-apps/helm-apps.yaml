@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: helm-apps
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ngyuki-sandbox/argocd-example.git
+    targetRevision: main
+    path: apps/helm-apps/
+    helm:
+      parameters:
+        - name: ARGOCD_APP_SOURCE_PATH
+          value: $ARGOCD_APP_SOURCE_PATH
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
