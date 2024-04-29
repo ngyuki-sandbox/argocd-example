@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application-set-cm
+data:
+  APP_NAME: application-set-cm
