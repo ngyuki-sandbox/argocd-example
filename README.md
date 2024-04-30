@@ -8,12 +8,11 @@ helm repo update
 
 kubectl create namespace argocd
 
-helm install -n argocd argocd argo/argo-cd --set configs.params.server\\.insecure=true --set configs.cm.exec\\.enabled=true
+helm install -n argocd argocd argo/argo-cd --version 5.46.7 -f argocd.values.yaml
 
 kubectl get pods -n argocd -w
 kubectl get service -n argocd
 
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 kubectl port-forward service/argocd-server -n argocd 8080:443
 
 open http://localhost:8080

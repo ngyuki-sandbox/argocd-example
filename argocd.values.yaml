@@ -1,0 +1,8 @@
+configs:
+  params:
+    server.insecure: true
+  cm:
+    exec.enabled: true
+  secret:
+    # htpasswd -nbBC 10 "" password | tr -d ':\n' | sed 's/$2y/$2a/'
+    argocdServerAdminPassword: '$2a$10$BBgFlw6nxdMv22hgBir30uoW8n/FRH09CmQeJIlEomG8WmH/B8hK6'
