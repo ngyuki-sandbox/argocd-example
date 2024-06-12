@@ -9,6 +9,7 @@ helm:
   - { name: ARGOCD_APP_SOURCE_PATH,            value: $ARGOCD_APP_SOURCE_PATH }
   - { name: ARGOCD_APP_SOURCE_REPO_URL,        value: $ARGOCD_APP_SOURCE_REPO_URL }
   - { name: ARGOCD_APP_SOURCE_TARGET_REVISION, value: $ARGOCD_APP_SOURCE_TARGET_REVISION }
+  - { name: commit_sha,                        value: $ARGOCD_APP_REVISION }
   valueFiles:
     - values.yaml
     - values-ovedrride.yaml
