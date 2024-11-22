@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pr-1-cm
+data:
+  APP_NAME: pr-1-cm

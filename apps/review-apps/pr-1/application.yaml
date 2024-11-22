@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: argocd
+  name: pr-1
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ngyuki-sandbox/argocd-example.git
+    targetRevision: main
+    path: apps/review-apps/pr-1/
+    directory:
+      exclude: application.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: review-apps
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
