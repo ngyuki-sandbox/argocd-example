@@ -6,6 +6,7 @@
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 
+kind create cluster
 kubectl create namespace argocd
 
 helm install -n argocd argocd argo/argo-cd --version 5.46.7 -f argocd.values.yaml
@@ -16,11 +17,6 @@ kubectl get service -n argocd
 kubectl port-forward service/argocd-server -n argocd 8080:443
 
 open http://localhost:8080
-```
-
-```sh
-curl http://localhost:8080/api/webhook -H content-type:application/json -H X-GitHub-Event:push \
-  -d '{"ref":"refs/heads/main","repository":{"html_url":"https://github.com/ngyuki-sandbox/argocd-example"}}'
 ```
 
 ## argocd-apps
@@ -48,15 +44,16 @@ kubectl apply -n argocd-hooks -f apps/argocd-hooks/secrets.yaml
 
 ## argocd-notifications
 
-> https://argocd-notifications.readthedocs.io/en/stable/
+> https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/
 
 ```sh
-cp apps/argocd-notifications/argocd-notifications-secret.yaml.example apps/argocd-notifications/argocd-notifications-secret.yaml
-vim apps/argocd-notifications/argocd-notifications-secret.yaml
+kubectl -n argocd apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/notifications_catalog/install.yaml
+kubectl -n argocd get pods -w
 
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-notifications/release-1.0/manifests/install.yaml
-kubectl apply -n argocd -f apps/argocd-notifications/argocd-notifications-secret.yaml
-kubectl apply -n argocd -f apps/argocd-notifications/argocd-notifications-cm.yaml
+cp argocd-notifications/argocd-notifications-secret.yaml.example argocd-notifications/argocd-notifications-secret.yaml
+vim argocd-notifications/argocd-notifications-secret.yaml
+kubectl -n argocd apply -f argocd-notifications/argocd-notifications-secret.yaml
+kubectl -n argocd apply -f argocd-notifications/argocd-notifications-cm.yaml
 
-kubectl get pods -n argocd -w
+kubectl -n argocd get cm argocd-notifications-cm -o yaml > argocd-notifications/orig.yaml
 ```
